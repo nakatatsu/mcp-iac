@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rg:*)",
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(unzip:*)",
+      "Bash(python:*)",
+      "Bash(pip:*)",
+      "Bash(curl:*)",
+      "Bash(wget:*)",
+      "Bash(tar:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(make:*)",
+      "Bash(head:*)",
+      "Bash(fc-list:*)"
+    ],
+    "deny": []
+  }
+}

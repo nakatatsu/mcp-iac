@@ -1,0 +1,69 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: MCP IaC Documentation Server - Serverless deployment
+
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+    Description: Deployment stage
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 1024
+    Runtime: python3.13
+    Architectures:
+      - arm64
+    Environment:
+      Variables:
+        AWS_LAMBDA_EXEC_WRAPPER: /opt/bootstrap
+        PORT: 8000
+        STATELESS_HTTP: true
+
+Resources:
+  MCPIaCDocFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: run.sh
+      FunctionName: !Sub ${AWS::StackName}-mcp-iac-doc-${Stage}
+      Description: MCP server for IaC documentation
+      Layers:
+        - !Sub arn:aws:lambda:${AWS::Region}:753240598075:layer:LambdaAdapterLayerArm64:25
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+            RestApiId: !Ref MCPIaCDocApi
+      Environment:
+        Variables:
+          PYTHONPATH: /var/task/src
+
+  MCPIaCDocApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref Stage
+      Name: !Sub ${AWS::StackName}-mcp-iac-doc-api
+      Description: API Gateway for MCP IaC Documentation server
+      Cors:
+        AllowMethods: "'*'"
+        AllowHeaders: "'*'"
+        AllowOrigin: "'*'"
+      BinaryMediaTypes:
+        - '*/*'
+
+Outputs:
+  ApiUrl:
+    Description: API Gateway endpoint URL
+    Value: !Sub https://${MCPIaCDocApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}/
+  
+  FunctionArn:
+    Description: Lambda Function ARN
+    Value: !GetAtt MCPIaCDocFunction.Arn
+  
+  FunctionName:
+    Description: Lambda Function Name
+    Value: !Ref MCPIaCDocFunction
