@@ -23,6 +23,11 @@ s3_client = boto3.client('s3')
 
 
 @mcp.tool()
+def test() -> Dict[str, str]:
+    """Simple test endpoint"""
+    return {"status": "ok", "message": "Server is working"}
+
+@mcp.tool()
 def get_document(document_name: str) -> Dict[str, Any]:
     """Get a specific document by name from S3
     

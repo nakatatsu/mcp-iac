@@ -39,7 +39,7 @@ test-api:
 	curl -s -X POST $${API_URL}mcp/ \
 		-H "Content-Type: application/json" \
 		-H "Accept: application/json, text/event-stream" \
-		-d '{"jsonrpc": "2.0", "method": "tools/get_document", "params": {"document_name": "development_guidelines"}, "id": 1}' | python -m json.tool
+		-d '{"jsonrpc": "2.0", "method": "tools/call", "params": {"name": "get_document", "arguments": {"document_name": "development_guidelines"}}, "id": 1}' | python -m json.tool
 
 # Test API locally (convenience target)
 test-local:
