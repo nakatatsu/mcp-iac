@@ -20,9 +20,19 @@ echo "Updating Lambda function: ${FUNCTION_NAME}"
 
 # Create deployment package
 echo "Creating deployment package..."
-cd src
-zip -r "${TEMP_DIR}/deployment.zip" . -x "__pycache__/*" "*.pyc"
-cd ..
+
+# Install dependencies to temp directory
+echo "Installing dependencies..."
+pip install -r requirements.txt -t "${TEMP_DIR}/package" --platform manylinux2014_x86_64 --implementation cp --python-version 3.13 --only-binary=:all:
+
+# Copy application code
+echo "Copying application code..."
+cp -r src/* "${TEMP_DIR}/package/"
+
+# Create zip file
+cd "${TEMP_DIR}/package"
+zip -r "${TEMP_DIR}/deployment.zip" . -x "__pycache__/*" "*.pyc" "*.dist-info/*"
+cd -
 
 # Update function code
 echo "Updating function code..."
