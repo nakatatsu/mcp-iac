@@ -48,3 +48,7 @@ Use Terraform for infrastructure deployment.
 ## Development Notes
 
 The application uses stateless HTTP mode for compatibility with serverless deployments. Document paths are resolved relative to the application root.
+
+## IMPORTANT: Lambda Handler Requirements
+
+**DO NOT use Mangum** for Lambda integration. This project uses FastMCP's native `stateless_http=True` mode which provides direct Lambda compatibility without additional adapters.
