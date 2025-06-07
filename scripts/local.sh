@@ -20,6 +20,7 @@ fi
 # Set environment variables for local development
 export PYTHONPATH="src"
 export PORT="${PORT}"
+export S3_BUCKET_NAME="${S3_BUCKET_NAME:-development-tfdoc}"
 
 # Change to src directory and run the application
 cd src

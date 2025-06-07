@@ -10,6 +10,7 @@ run:
 
 # Run the application with script (optional port parameter)
 local:
+#	source venv/bin/activate
 	./scripts/local.sh
 
 # Clean build artifacts
@@ -28,10 +29,21 @@ update:
 
 # Test the API (requires API_URL environment variable)
 test-api:
-	@echo "Testing list_documents endpoint..."
-	@curl -X POST $${API_URL}mcp/tools/list_documents \
+	@if [ -z "$$API_URL" ]; then \
+		echo "API_URL not set, using local endpoint..."; \
+		API_URL="http://localhost:8000/"; \
+	else \
+		echo "Using API_URL: $$API_URL"; \
+	fi; \
+	echo "Testing get_document endpoint..."; \
+	curl -s -X POST $${API_URL}mcp/ \
 		-H "Content-Type: application/json" \
-		-d '{}'
+		-H "Accept: application/json, text/event-stream" \
+		-d '{"jsonrpc": "2.0", "method": "tools/get_document", "params": {"document_name": "development_guidelines"}, "id": 1}' | python -m json.tool
+
+# Test API locally (convenience target)
+test-local:
+	@API_URL=http://localhost:8000/ make test-api
 
 commit:
 	@git add . && git commit -m "Update" 
