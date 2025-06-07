@@ -1,6 +1,6 @@
-# Serverless MCP IaC Documentation Server
+# MCP IaC Documentation Server
 
-AWS Lambda上で動作するMCP (Model Context Protocol) サーバーです。Infrastructure as Code (IaC) のドキュメントをAIエージェントに提供します。
+MCP (Model Context Protocol) サーバーです。Infrastructure as Code (IaC) のドキュメントをAIエージェントに提供します。
 
 ## 機能
 
@@ -11,10 +11,9 @@ AWS Lambda上で動作するMCP (Model Context Protocol) サーバーです。In
 
 ## アーキテクチャ
 
-- **AWS Lambda**: Python 3.13ランタイム（ARM64）
-- **API Gateway**: RESTful API エンドポイント
-- **Lambda Web Adapter**: HTTP サーバーサポート
 - **FastMCP**: MCP プロトコル実装
+- **Python 3.13**: アプリケーションランタイム
+- **Terraform**: インフラストラクチャデプロイ
 
 ## 利用可能なツール
 
@@ -34,50 +33,47 @@ AWS Lambda上で動作するMCP (Model Context Protocol) サーバーです。In
 
 ### 前提条件
 
-- AWS CLI設定済み
-- AWS SAM CLIインストール済み
 - Python 3.13
+- Terraform（インフラストラクチャデプロイ用）
 
 ### インストール
 
 ```bash
 # 依存関係のインストール
 make install
-
-# SAMアプリケーションのビルド
-make build
-```
-
-### デプロイ
-
-初回デプロイ:
-```bash
-make deploy-guided
-```
-
-以降のデプロイ:
-```bash
-make deploy
 ```
 
 ### ローカル開発
 
 ```bash
-# SAM Localで実行
-make local
-
 # 直接実行
 make run
+
+# スクリプトを使って実行（デフォルトポート: 8000）
+make local
+
+# スクリプトを使って実行（ポート指定）
+./scripts/local.sh 8080
+```
+
+### デプロイ・更新
+
+```bash
+# Lambda関数の更新（環境名を指定）
+ENVIRONMENT=development make update
+
+# または直接スクリプトを実行
+./scripts/update.sh development
 ```
 
 ## 使用方法
 
-デプロイ後、API GatewayのエンドポイントURLが表示されます。
+デプロイ後、APIエンドポイントが利用可能になります。
 
 ### 例: ドキュメント一覧の取得
 
 ```bash
-curl -X POST https://your-api-id.execute-api.region.amazonaws.com/dev/mcp/tools/list_documents \
+curl -X POST ${API_URL}/mcp/tools/list_documents \
   -H "Content-Type: application/json" \
   -d '{}'
 ```
@@ -85,31 +81,23 @@ curl -X POST https://your-api-id.execute-api.region.amazonaws.com/dev/mcp/tools/
 ### 例: 開発ガイドラインの取得
 
 ```bash
-curl -X POST https://your-api-id.execute-api.region.amazonaws.com/dev/mcp/tools/get_development_guidelines \
+curl -X POST ${API_URL}/mcp/tools/get_development_guidelines \
   -H "Content-Type: application/json" \
   -d '{}'
 ```
 
 ## 設定
 
-`samconfig.toml.example`をコピーして`samconfig.toml`を作成し、必要に応じて設定を変更してください。
+ドキュメントファイルは以下のディレクトリに配置してください：
+
+- `documents/` - 一般的なドキュメント（YAML形式）
+- `resouces_specification/` - リソース固有の仕様（YAML形式）
+
+## テスト
 
 ```bash
-cp samconfig.toml.example samconfig.toml
-```
-
-## トラブルシューティング
-
-### ログの確認
-
-```bash
-make logs
-```
-
-### テンプレートの検証
-
-```bash
-make validate
+# APIのテスト（API_URL環境変数が必要）
+make test-api
 ```
 
 ## ライセンス
