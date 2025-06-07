@@ -5,14 +5,7 @@ import boto3
 from typing import Dict, List, Optional, Any
 from fastmcp import FastMCP
 from botocore.exceptions import ClientError
-
-# Create MCP instance with stateless HTTP mode for Lambda
-mcp = FastMCP(
-    stateless_http=True,
-    json_response=True,
-    name="mcp-iac-doc",
-    version="1.0.0"
-)
+from contextlib import asynccontextmanager
 
 # S3 bucket configuration
 S3_BUCKET_NAME = os.environ.get('S3_BUCKET_NAME')
@@ -22,6 +15,13 @@ if not S3_BUCKET_NAME:
 # Initialize S3 client
 s3_client = boto3.client('s3')
 
+# Create MCP instance with stateless HTTP mode for Lambda
+mcp = FastMCP(
+    stateless_http=True,
+    json_response=True,
+    name="mcp-iac-doc",
+    version="1.0.0"
+)
 
 @mcp.tool()
 def test() -> Dict[str, str]:
@@ -70,8 +70,19 @@ def get_document(document_name: str) -> Dict[str, Any]:
 # Get the ASGI app for HTTP streaming
 app = mcp.streamable_http_app()
 
+# カスタムlifespanコンテキストマネージャーを定義
+@asynccontextmanager
+async def lifespan(app):
+    # FastMCPのlifespanを実行
+    async with app.state.fastmcp_server.session_manager.run():
+        yield
+
+# FastAPIやStarletteアプリケーションのようにlifespanを設定
+app.router.lifespan_context = lifespan
+
 # Create Mangum handler for AWS Lambda
-handler = Mangum(app, lifespan="off")
+# lifespan="auto"を使用してASGIアプリケーションのlifespanを検出させる
+handler = Mangum(app, lifespan="auto")
 
 if __name__ == "__main__":
     import uvicorn
