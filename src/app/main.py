@@ -14,7 +14,7 @@ mcp = FastMCP(
 )
 
 # S3 bucket configuration
-S3_BUCKET_NAME = os.environ.get('S3_BUCKET_NAME', 'development-tfdoc')
+S3_BUCKET_NAME = os.environ.get('S3_BUCKET_NAME')
 if not S3_BUCKET_NAME:
     raise ValueError("S3_BUCKET_NAME environment variable is required")
 
