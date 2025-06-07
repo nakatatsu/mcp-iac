@@ -31,7 +31,7 @@ cp -r src/* "${TEMP_DIR}/package/"
 
 # Create zip file
 cd "${TEMP_DIR}/package"
-zip -r "${TEMP_DIR}/deployment.zip" . -x "__pycache__/*" "*.pyc" "*.dist-info/*"
+zip -r "${TEMP_DIR}/deployment.zip" . -x "__pycache__/*" "*.pyc"
 cd -
 
 # Update function code

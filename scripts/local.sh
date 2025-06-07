@@ -11,10 +11,10 @@ PORT=${1:-8000}
 
 echo "Starting MCP IaC Documentation Server locally on port ${PORT}..."
 
-# Check if dependencies are installed
-if [ ! -d "venv" ] && [ ! -f ".python-version" ]; then
-    echo "Installing dependencies..."
-    pip install -r requirements.txt
+# Check if virtual environment exists
+if [ ! -d "venv" ]; then
+    echo "Virtual environment not found. Please create one with: python3 -m venv venv"
+    exit 1
 fi
 
 # Set environment variables for local development
@@ -24,4 +24,4 @@ export S3_BUCKET_NAME="${S3_BUCKET_NAME:-development-tfdoc}"
 
 # Change to src directory and run the application
 cd src
-python -m app --host 0.0.0.0 --port ${PORT}
+python lambda_function.py

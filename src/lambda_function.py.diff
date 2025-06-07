@@ -1,3 +1,4 @@
+from mangum import Mangum
 import os
 import yaml
 import boto3
@@ -66,8 +67,11 @@ def get_document(document_name: str) -> Dict[str, Any]:
     }
 
 
-# Create the app instance for Lambda
-app = mcp.http_app
+# Get the ASGI app for HTTP streaming
+app = mcp.streamable_http_app()
+
+# Create Mangum handler for AWS Lambda
+handler = Mangum(app, lifespan="off")
 
 if __name__ == "__main__":
     import uvicorn

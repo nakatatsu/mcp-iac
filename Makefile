@@ -2,16 +2,15 @@
 
 # Install dependencies
 install:
-	pip install -r requirements.txt
+	source venv/bin/activate && pip install -r requirements.txt
 
 # Run the application directly
 run:
-	cd src && python -m app
+	source venv/bin/activate && cd src && python lambda_function.py
 
 # Run the application with script (optional port parameter)
 local:
-#	source venv/bin/activate
-	./scripts/local.sh
+	source venv/bin/activate && ./scripts/local.sh
 
 # Clean build artifacts
 clean:
